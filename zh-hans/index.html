@@ -1,107 +1,33 @@
 <!doctype html>
 <html lang="zh-Hans">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Magic Water Puzzle – 隐私政策</title>
-<meta name="description" content="Magic Water Puzzle 游戏简介与隐私政策。">
-<style>
-  :root{--fg:#1f2937;--muted:#6b7280;--bg:#fff;--card:#f8fafc;--accent:#2563eb;--maxw:960px}
-  *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,'Noto Sans SC',sans-serif;color:var(--fg);background:var(--bg);line-height:1.7}
-  header{padding:24px 16px;background:#f3f4f6;border-bottom:1px solid #e5e7eb}
-  .wrap{max-width:var(--maxw);margin:0 auto}
-  nav{display:flex;gap:12px;flex-wrap:wrap}
-  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
-  main{padding:20px 16px}
-  .grid{display:grid;grid-template-columns:1fr;gap:16px}
-  @media(min-width:800px){.grid{grid-template-columns:1fr 280px}}
-  section{margin:24px auto;padding:20px;background:var(--card);border:1px solid #e5e7eb;border-radius:14px}
-  h1{margin:0 0 6px} h2{margin:0 0 12px} h3{margin:18px 0 8px}
-  ul{padding-left:20px}
-  footer{padding:28px 16px;text-align:center;color:var(--muted);border-top:1px solid #e5e7eb}
-  .lang{margin-left:auto}
-  .btn{display:inline-block;padding:10px 14px;background:var(--accent);color:#fff;border-radius:10px}
-  .card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px}
-  .icon{width:100%;max-width:220px;border-radius:16px;display:block;margin:0 auto}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>游戏产品 | VanilleKR</title>
+  <link rel="preload" as="image" href="/assets/images/magic-water-puzzle-icon.png">
+  <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-<header>
-  <div class="wrap" style="display:flex;align-items:center;gap:16px">
-    <div>
-      <h1>Magic Water Puzzle</h1>
-      <nav>
-        <a href="#overview">游戏简介</a>
-        <a href="#privacy">隐私政策</a>
-      </nav>
-    </div>
-    <div class="lang">
-      <label class="small" style="color:#6b7280">语言</label><br>
-      <select onchange="location.href=this.value">
-        <option value="/en/">English</option>
-        <option value="/zh-hant/">中文（繁體）</option>
-        <option value="/zh-hans/" selected>中文（简体）</option>
-        <option value="/ja/">日本語</option>
-      </select>
-    </div>
-  </div>
-</header>
+  <div class="container">
+    <header class="header">
+      <div class="title">游戏产品</div>
+    </header>
 
-<main class="wrap">
-  <div class="grid">
-    <div>
-      <section id="overview">
-        <h2>游戏简介</h2>
-        <p>Magic Water Puzzle 是一款轻松的药水分类益智游戏。将相同颜色的药水倒入同一试管。简单直接，消磨时间的好选择！</p>
-        <p><a class="btn" href="https://play.google.com/store/apps/details?id=com.VanilleKR.MagicWaterPuzzle" target="_blank" rel="noopener">前往 Google Play</a></p>
-      </section>
-
-      <section id="privacy">
-        <h2>隐私政策</h2>
-        <p>请阅读本政策以了解 Magic Water Puzzle 如何收集和使用信息。本政策适用于本游戏应用和网站。</p>
-
-        <h3>我们收集的信息及用途</h3>
-        <p><strong>你提供的个人信息：</strong> 当你联系到我们或使用某些功能时，可能会要求提供姓名、邮箱或其他联系方式。我们使用这些信息与您沟通、提供支持，并在必要时联系你；也可能用于调查、预防或处理未经授权的服务使用。若用于不同于收集目的的用途，我们会事先征得你的同意。</p>
-        <p><strong>非个人信息：</strong> 我们收集匿名的非个人信息，例如 IP 地址、操作系统版本、设备详情（如设备型号）、广告标识符、浏览器类型与语言、你的网络请求及其日期时间。此类信息可用于审计、提供或改进服务，以及开发新服务。</p>
-
-        <h3>云端存档（Google Play 游戏服务 – Saved Games）</h3>
-        <p>在 Android 上，我们使用 Google Play 游戏服务（Saved Games）让你将关卡进度、物品和设置备份到云端，并在重装或更换设备后恢复。</p>
-        <p>使用该功能时，与游戏进度相关的数据（例如关卡推进、物品拥有、偏好设置、时间戳）会通过你的 Google 账号同步，并存储在 Google 的云基础设施上。</p>
-        <p><strong>你的控制：</strong> 我们在应用内提供“删除存档”按钮，可删除本游戏的云端存档。若你退出 Google Play 游戏或撤销权限，云同步与恢复可能不可用。</p>
-
-        <h3>信息共享</h3>
-        <p>除以下情况外，未经你的允许我们不会与第三方共享你的个人信息：</p>
-        <ul>
-          <li>为提供你所请求的产品或服务，且仅按我们的指示并遵守本政策。</li>
-          <li>法律、法规或诉讼要求时。</li>
-          <li>为执法或其他公共利益必须披露时。</li>
-          <li>并购或资产出售相关情形；个人信息被转移并受不同政策约束前会通知。</li>
-        </ul>
-        <p>我们可能共享汇总的、非个人信息（例如某页面的浏览人数）。</p>
-
-        <h3>安全</h3>
-        <p>我们致力于以商业上可接受的方式保护个人信息，但互联网传输或电子存储无法保证 100% 安全。</p>
-
-        <h3>其他网站链接</h3>
-        <p>本服务可能包含指向其他网站的链接。外部网站并非我们运营；请查阅其隐私政策。</p>
-
-        <h3>儿童隐私</h3>
-        <p>本服务不针对 13 岁以下人士；我们不会明知地收集 13 岁以下儿童的个人信息。</p>
-
-        <p style="color:#6b7280">最后更新：2025-10-22</p>
-      </section>
-    </div>
-
-    <aside>
+    <section class="grid">
       <div class="card">
-        <img src="/icon_v1.png" alt="Magic Water Puzzle 应用图标" class="icon">
+        <a class="app-link" href="https://play.google.com/store/apps/details?id=com.VanilleKR.MagicWaterPuzzle" target="_blank" rel="noopener">
+          <img class="icon" src="/assets/images/magic-water-puzzle-icon.png" alt="Magic Water Puzzle Icon">
+          <div>
+            <p class="app-name">Magic Water Puzzle</p>
+            <div class="sub">前往 Google Play</div>
+          </div>
+        </a>
+        <div class="sub"><a href="/zh-hans/games/magic-water-puzzle/privacy.html">隐私权政策</a></div>
       </div>
-    </aside>
-  </div>
-</main>
+    </section>
 
-<footer>
-  VanilleKR · <a href="mailto:VanilleKR@gmail.com">VanilleKR@gmail.com</a>
-</footer>
+    <footer class="footer">© <span id="y"></span> VanilleKR</footer>
+  </div>
+  <script>document.getElementById('y').textContent=new Date().getFullYear();</script>
 </body>
 </html>

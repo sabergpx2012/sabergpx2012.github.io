@@ -8,11 +8,14 @@
   <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <div class="title">Games</div>
-    </header>
+  <header class="banner" style="--banner-bg: linear-gradient(135deg,#1d4ed8 0%,#9333ea 100%);">
+    <div class="banner-inner">
+      <h1>VanilleKR Games</h1>
+      <p>Casual puzzles you can enjoy anywhere.</p>
+    </div>
+  </header>
 
+  <main class="main">
     <section class="grid">
       <div class="card">
         <a class="app-link" href="https://play.google.com/store/apps/details?id=com.VanilleKR.MagicWaterPuzzle" target="_blank" rel="noopener">
@@ -27,7 +30,8 @@
     </section>
 
     <footer class="footer">© <span id="y"></span> VanilleKR</footer>
-  </div>
+  </main>
+
   <script>document.getElementById('y').textContent=new Date().getFullYear();</script>
 </body>
 </html>

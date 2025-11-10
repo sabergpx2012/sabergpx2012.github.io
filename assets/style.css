@@ -5,6 +5,11 @@
   --card:#f7f7f7;
   --brand:#2563eb;
   --border:#e5e7eb;
+  --banner-h:180px;
+  --banner-fg:#ffffff;
+  --banner-bg:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+  --banner-image:none; /* e.g. url('/assets/images/hero-games.jpg') */
+  --banner-overlay:rgba(0,0,0,.35);
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -14,6 +19,7 @@
     --card:#11161c;
     --brand:#60a5fa;
     --border:#1f2937;
+    --banner-fg:#eef2ff;
   }
 }
 *{box-sizing:border-box}
@@ -31,6 +37,7 @@ body{
 @media (max-width:1024px){.grid{grid-template-columns:repeat(3,1fr);}}
 @media (max-width:768px){.grid{grid-template-columns:repeat(2,1fr);}}
 @media (max-width:480px){.grid{grid-template-columns:1fr;}}
+
 .card{
   background:var(--card);border:1px solid var(--border);border-radius:14px;
   padding:16px;display:flex;align-items:center;gap:12px;
@@ -42,3 +49,54 @@ body{
 .card a.app-link{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;}
 .sub{font-size:12px;color:var(--muted);margin-top:4px;}
 .footer{margin-top:28px;color:var(--muted);font-size:12px;text-align:center;}
+
+/* Banner */
+.banner{
+  position:relative; isolation:isolate;
+  min-height:var(--banner-h);
+  display:flex; align-items:center;
+  color:var(--banner-fg);
+  background:
+    var(--banner-bg);
+  overflow:hidden;
+}
+.banner.has-image{
+  background:none;
+  /* Layer image + overlay */
+}
+.banner.has-image::before{
+  content:""; position:absolute; inset:0; z-index:-2;
+  background-image:var(--banner-image);
+  background-size:cover; background-position:center;
+  filter:contrast(1.05) saturate(1.1);
+}
+.banner.has-image::after{
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:var(--banner-overlay);
+}
+.banner .banner-inner{
+  width:100%;
+  max-width:960px;
+  margin:0 auto;
+  padding:28px 24px;
+}
+.banner h1{
+  margin:0 0 4px 0;
+  font-size:28px; line-height:1.25;
+}
+.banner p{
+  margin:0;
+  color:rgba(255,255,255,.9);
+}
+@media (max-width:480px){
+  :root{ --banner-h:150px; }
+  .banner h1{ font-size:22px; }
+  .banner p{ font-size:14px; }
+}
+
+/* Content spacing after banner */
+.main{
+  padding:24px;
+  max-width:960px;
+  margin:0 auto;
+}

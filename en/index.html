@@ -7,6 +7,39 @@
   <link rel="preload" as="image" href="/assets/images/magic-water-puzzle-icon.png">
   <link rel="preload" as="image" href="/assets/images/magic-critter-match-icon.png">
   <link rel="stylesheet" href="/assets/style.css">
+  <style>
+    /* Store badge buttons */
+    .store-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.25rem}
+    .store-badge{
+      display:inline-flex;align-items:center;gap:.5rem;
+      background:#000;color:#fff;border-radius:.75rem;
+      padding:.5rem .75rem;text-decoration:none;line-height:1;
+      box-shadow:0 1px 2px rgba(0,0,0,.15); transition:transform .05s ease,opacity .2s ease;
+    }
+    .store-badge:hover{transform:translateY(-1px);opacity:.95}
+    .store-badge:active{transform:translateY(0)}
+    .store-badge .icon{width:20px;height:20px;display:block}
+    .store-badge .txt{display:flex;flex-direction:column}
+    .store-badge .small{font-size:.65rem;opacity:.85;letter-spacing:.02em}
+    .store-badge .big{font-size:.95rem;font-weight:700}
+
+    /* SVG icons inherit currentColor unless filled; we keep them white */
+    .apple-icon path,.gp-icon path{fill:#fff}
+
+    /* Card tweaks so badges排版好看 */
+    .card .sub-links{margin-top:.25rem}
+    .card .sub-links a{color:var(--link, #5b21b6)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+    .card{background:#fff;border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    .app-link{display:flex;gap:.75rem;text-decoration:none;color:inherit}
+    .icon{width:64px;height:64px;border-radius:12px;object-fit:cover}
+    .app-name{font-weight:700;margin:0}
+    .sub{font-size:.9rem;color:#666}
+    @media (max-width:420px){
+      .store-badge{padding:.45rem .65rem;border-radius:.6rem}
+      .store-badge .big{font-size:.9rem}
+    }
+  </style>
 </head>
 <body>
   <header class="banner" style="--banner-bg: linear-gradient(135deg,#1d4ed8 0%,#9333ea 100%);">
@@ -27,7 +60,22 @@
             <div class="sub">Google Play</div>
           </div>
         </a>
-        <div class="sub"><a href="/en/games/magic-water-puzzle/privacy.html">Privacy Policy</a></div>
+        <div class="sub-links">
+          <a href="/en/games/magic-water-puzzle/privacy.html">Privacy Policy</a>
+        </div>
+        <div class="store-row" aria-label="Download links for Magic Water Puzzle">
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.VanilleKR.MagicWaterPuzzle" target="_blank" rel="noopener" aria-label="Get it on Google Play">
+            <svg class="icon gp-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M325.3 234.3L96.1 5.1c-6.7 3.1-11.1 9.9-11.1 17.6v466.5c0 7.7 4.4 14.5 11.1 17.6l229.2-229.2-53.1-43.3 53.1-43z"/>
+              <path d="M359 200.6L137.4 52.2 325.3 234.3 359 200.6zM359 311.4l-33.7-33.7L137.4 459.8 359 311.4z"/>
+              <path d="M477.4 227.8L410 188.9 356.9 232.2l-53.1 43.3 53.1 43.3 53.1 43.3 67.4-38.9c18.5-10.7 18.5-37.5 0-48.7z"/>
+            </svg>
+            <span class="txt">
+              <span class="small">GET IT ON</span>
+              <span class="big">Google Play</span>
+            </span>
+          </a>
+        </div>
       </div>
 
       <!-- Magic Critter Match -->
@@ -39,12 +87,35 @@
             <div class="sub">Google Play • iOS</div>
           </div>
         </a>
-        <div class="sub">
+
+        <div class="sub-links">
           <a href="/en/games/magic-critter-match/privacy.html">Privacy Policy</a>
-          ·
-          <a href="https://apps.apple.com/us/app/magic-critter-match/id6755140633" target="_blank" rel="noopener">App Store</a>
-          ·
-          <a href="https://play.google.com/store/apps/details?id=com.VanilleKR.MagicCritterMatch" target="_blank" rel="noopener">Google Play</a>
+        </div>
+
+        <div class="store-row" aria-label="Download links for Magic Critter Match">
+          <!-- App Store badge -->
+          <a class="store-badge" href="https://apps.apple.com/us/app/magic-critter-match/id6755140633" target="_blank" rel="noopener" aria-label="Download on the App Store">
+            <svg class="icon apple-icon" viewBox="0 0 384 512" aria-hidden="true">
+              <path d="M318.7 268.7c-.4-43.5 35.6-64.5 37.2-65.6-20.3-29.6-51.8-33.7-62.9-34.2-26.8-2.7-52.2 15.8-65.7 15.8-13.7 0-34.5-15.4-56.8-15-29.3.4-56.3 17-71.4 43.1-30.5 52.8-7.8 130.8 21.9 173.7 14.5 21 31.8 44.6 54.7 43.7 22-1 30.3-14.2 56.8-14.2 26.3 0 34.1 14.2 56.9 13.7 23.5-.4 38.4-21.4 52.8-42.5 16.6-24.3 23.5-47.9 23.9-49.1-.5-.2-45.8-17.6-46.4-69.4zM260.1 96.7c12.3-14.9 20.7-35.6 18.4-56.4-17.8.7-39.3 11.9-52 26.8-11.4 12.7-21.3 33.2-18.6 52.7 19.8 1.5 40.1-10.1 52.2-23.1z"/>
+            </svg>
+            <span class="txt">
+              <span class="small">Download on the</span>
+              <span class="big">App Store</span>
+            </span>
+          </a>
+
+          <!-- Google Play badge -->
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.VanilleKR.MagicCritterMatch" target="_blank" rel="noopener" aria-label="Get it on Google Play">
+            <svg class="icon gp-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M325.3 234.3L96.1 5.1c-6.7 3.1-11.1 9.9-11.1 17.6v466.5c0 7.7 4.4 14.5 11.1 17.6l229.2-229.2-53.1-43.3 53.1-43z"/>
+              <path d="M359 200.6L137.4 52.2 325.3 234.3 359 200.6zM359 311.4l-33.7-33.7L137.4 459.8 359 311.4z"/>
+              <path d="M477.4 227.8L410 188.9 356.9 232.2l-53.1 43.3 53.1 43.3 53.1 43.3 67.4-38.9c18.5-10.7 18.5-37.5 0-48.7z"/>
+            </svg>
+            <span class="txt">
+              <span class="small">GET IT ON</span>
+              <span class="big">Google Play</span>
+            </span>
+          </a>
         </div>
       </div>
     </section>

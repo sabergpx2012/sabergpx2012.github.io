@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sasa 下樓梯</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #222;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            max-height: 800px;
+            background-color: #333;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+            z-index: 10;
+        }
+
+        #hp-bar-container {
+            width: 100px;
+            height: 20px;
+            background: #555;
+            border: 2px solid #fff;
+        }
+
+        #hp-bar {
+            width: 100%;
+            height: 100%;
+            background: #f00;
+            transition: width 0.2s;
+        }
+
+        #start-screen, #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.5;
+            padding: 0 20px;
+            color: #ccc;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #touch-controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            z-index: 5;
+        }
+
+        .touch-zone {
+            flex: 1;
+        }
+        
+        .touch-hint {
+            position: absolute;
+            bottom: 50px;
+            width: 50%;
+            text-align: center;
+            font-size: 40px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .left-hint { left: 0; }
+        .right-hint { right: 0; }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="touch-controls">
+            <div id="btn-left" class="touch-zone"></div>
+            <div id="btn-right" class="touch-zone"></div>
+        </div>
+        
+        <div class="touch-hint left-hint">⬅️</div>
+        <div class="touch-hint right-hint">➡️</div>
+
+        <div id="ui-layer">
+            <div class="hud">
+                <div id="hp-bar-container"><div id="hp-bar"></div></div>
+                <div>層數: <span id="score">0</span></div>
+            </div>
+        </div>
+
+        <div id="start-screen">
+            <h1>Sasa 下樓梯</h1>
+            <p>
+                電腦：左右方向鍵移動<br>
+                手機：按左半邊向左，按右半邊向右<br>
+                <br>
+                (請確保 sasa.jpg 在同一目錄下)
+            </p>
+            <button id="start-btn">開始遊戲</button>
+        </div>
+
+        <div id="game-over-screen" class="hidden">
+            <h1>遊戲結束</h1>
+            <p>Sasa 下到了第 <span id="final-score" style="color:white; font-weight:bold;">0</span> 層</p>
+            <button id="restart-btn">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameContainer = document.getElementById('game-container');
+        
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const scoreEl = document.getElementById('score');
+        const finalScoreEl = document.getElementById('final-score');
+        const hpBar = document.getElementById('hp-bar');
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+
+        // 載入角色圖片
+        const playerImg = new Image();
+        playerImg.src = 'sasa.png'; // 圖片路徑
+        let isImgLoaded = false;
+        playerImg.onload = () => { isImgLoaded = true; };
+
+        let gameState = 'MENU';
+        let lastTime = 0;
+        let score = 0;
+        let gameSpeed = 1.3; 
+        
+        let width, height;
+
+        function resize() {
+            width = gameContainer.clientWidth;
+            height = gameContainer.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        const player = {
+            x: 0,
+            y: 0,
+            width: 30, // 稍微加寬一點以適應圖片
+            height: 30,
+            vx: 0,
+            vy: 0,
+            speed: 4,
+            hp: 100,
+            maxHp: 100,
+            isOnGround: false,
+            color: '#fff',
+            direction: 1, // 1 為向右, -1 為向左
+            
+            reset: function() {
+                this.width = width * 0.08; // 調整角色大小比例
+                this.height = this.width;  // 正方形比例比較適合大頭貼
+                this.x = width / 2 - this.width / 2;
+                this.y = 100;
+                this.vx = 0;
+                this.vy = 0;
+                this.hp = this.maxHp;
+                this.isOnGround = false;
+                this.speed = width * 0.009; 
+                this.direction = 1;
+            },
+
+            update: function(dt) {
+                this.vy += 0.4; 
+
+                if (keys.left) {
+                    this.vx = -this.speed;
+                    this.direction = -1;
+                } else if (keys.right) {
+                    this.vx = this.speed;
+                    this.direction = 1;
+                } else {
+                    this.vx = 0;
+                }
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0) this.x = 0;
+                if (this.x + this.width > width) this.x = width - this.width;
+
+                const ceilingSpikeHeight = 20;
+                if (this.y < ceilingSpikeHeight) {
+                    this.hurt(5);
+                    this.y = ceilingSpikeHeight + 5;
+                    this.vy = 2;
+                }
+
+                if (this.y > height) {
+                    gameOver();
+                }
+            },
+
+            draw: function() {
+                if (isImgLoaded) {
+                    // 繪製圖片 (包含翻轉邏輯)
+                    ctx.save();
+                    // 將原點移動到角色中心
+                    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+                    
+                    // 如果方向向左，水平翻轉
+                    if (this.direction === -1) {
+                        ctx.scale(-1, 1);
+                    }
+                    
+                    // 繪製圖片 (因為原點在中心，所以xy要減半)
+                    ctx.drawImage(playerImg, -this.width / 2, -this.height / 2, this.width, this.height);
+                    
+                    ctx.restore();
+                } else {
+                    // 圖片沒載入時的備案 (原本的方塊)
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    
+                    ctx.fillStyle = 'black';
+                    const eyeSize = this.width * 0.2;
+                    const eyeOffset = this.direction === 1 ? this.width * 0.6 : this.width * 0.2;
+                    ctx.fillRect(this.x + eyeOffset, this.y + this.height * 0.2, eyeSize, eyeSize);
+                }
+
+                // 受傷閃爍效果
+                if (this.hurtTimer > 0) {
+                    this.hurtTimer--;
+                    ctx.fillStyle = `rgba(255,0,0,0.5)`;
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            },
+
+            hurt: function(amount) {
+                this.hp -= amount;
+                this.hurtTimer = 10;
+                if (this.hp <= 0) {
+                    this.hp = 0;
+                    gameOver();
+                }
+                updateHpBar();
+            },
+            
+            heal: function(amount) {
+                this.hp += amount;
+                if (this.hp > this.maxHp) this.hp = this.maxHp;
+                updateHpBar();
+            }
+        };
+
+        let platforms = [];
+        const PLATFORM_TYPES = {
+            NORMAL: 0,
+            SPIKE: 1,
+            SLIDE_LEFT: 2,
+            SLIDE_RIGHT: 3,
+            SPRING: 4,
+            FAKE: 5
+        };
+
+        class Platform {
+            constructor(y) {
+                this.width = width * 0.25;
+                this.height = 15;
+                this.x = Math.random() * (width - this.width);
+                this.y = y;
+                this.type = this.determineType();
+                this.active = true;
+                this.steppedOn = false;
+            }
+
+            determineType() {
+                const rand = Math.random();
+                let threshold = Math.min(0.5, score * 0.005);
+
+                if (rand < 0.6 - threshold) return PLATFORM_TYPES.NORMAL;
+                if (rand < 0.7) return PLATFORM_TYPES.FAKE;
+                if (rand < 0.8) return PLATFORM_TYPES.SPRING;
+                if (rand < 0.9) return PLATFORM_TYPES.SLIDE_LEFT;
+                if (rand < 0.95) return PLATFORM_TYPES.SLIDE_RIGHT;
+                return PLATFORM_TYPES.SPIKE;
+            }
+
+            update() {
+                this.y -= gameSpeed;
+                if (this.y + this.height < 0) {
+                    return false;
+                }
+                return true;
+            }
+
+            draw() {
+                if (!this.active) return;
+
+                switch (this.type) {
+                    case PLATFORM_TYPES.NORMAL:
+                        ctx.fillStyle = '#888';
+                        break;
+                    case PLATFORM_TYPES.SPIKE:
+                        ctx.fillStyle = '#888'; 
+                        ctx.beginPath();
+                        for(let i=0; i<this.width; i+=10) {
+                            ctx.moveTo(this.x + i, this.y);
+                            ctx.lineTo(this.x + i + 5, this.y - 10);
+                            ctx.lineTo(this.x + i + 10, this.y);
+                        }
+                        ctx.fillStyle = '#aaa';
+                        ctx.fill();
+                        ctx.fillStyle = '#555';
+                        break;
+                    case PLATFORM_TYPES.SLIDE_LEFT:
+                        ctx.fillStyle = '#44f';
+                        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        ctx.beginPath();
+                        ctx.moveTo(this.x + this.width - 10, this.y + 2);
+                        ctx.lineTo(this.x + 10, this.y + this.height/2);
+                        ctx.lineTo(this.x + this.width - 10, this.y + this.height - 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#44f';
+                        break;
+                    case PLATFORM_TYPES.SLIDE_RIGHT:
+                        ctx.fillStyle = '#44f';
+                         ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        ctx.beginPath();
+                        ctx.moveTo(this.x + 10, this.y + 2);
+                        ctx.lineTo(this.x + this.width - 10, this.y + this.height/2);
+                        ctx.lineTo(this.x + 10, this.y + this.height - 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#44f';
+                        break;
+                    case PLATFORM_TYPES.SPRING:
+                        ctx.fillStyle = '#4f4';
+                        break;
+                    case PLATFORM_TYPES.FAKE:
+                        ctx.fillStyle = '#dd4';
+                        if (this.steppedOn) {
+                            ctx.strokeStyle = 'black';
+                            ctx.beginPath();
+                            ctx.moveTo(this.x + 5, this.y);
+                            ctx.lineTo(this.x + 15, this.y + 10);
+                            ctx.stroke();
+                        }
+                        break;
+                }
+                
+                if (this.type !== PLATFORM_TYPES.SPIKE) {
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                } else {
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+            }
+        }
+
+        const keys = { left: false, right: false };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowLeft') keys.left = true;
+            if (e.code === 'ArrowRight') keys.right = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowLeft') keys.left = false;
+            if (e.code === 'ArrowRight') keys.right = false;
+        });
+
+        const handleTouch = (isLeft, isPressed) => {
+            if (isLeft) keys.left = isPressed;
+            else keys.right = isPressed;
+        };
+
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); handleTouch(true, true); });
+        btnLeft.addEventListener('touchend', (e) => { e.preventDefault(); handleTouch(true, false); });
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); handleTouch(false, true); });
+        btnRight.addEventListener('touchend', (e) => { e.preventDefault(); handleTouch(false, false); });
+        
+        btnLeft.addEventListener('mousedown', () => handleTouch(true, true));
+        btnLeft.addEventListener('mouseup', () => handleTouch(true, false));
+        btnRight.addEventListener('mousedown', () => handleTouch(false, true));
+        btnRight.addEventListener('mouseup', () => handleTouch(false, false));
+
+        function initGame() {
+            score = 0;
+            gameSpeed = 1.3; 
+            scoreEl.innerText = score;
+            platforms = [];
+            player.reset();
+            updateHpBar();
+            
+            let startY = height - 50;
+            for (let i = 0; i < 7; i++) {
+                let p = new Platform(startY);
+                p.type = PLATFORM_TYPES.NORMAL;
+                platforms.push(p);
+                startY -= 120;
+            }
+            platforms[0].x = width/2 - platforms[0].width/2; 
+            player.x = width/2 - player.width/2;
+            player.y = platforms[0].y - player.height - 10;
+
+            gameState = 'PLAYING';
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function spawnPlatform() {
+            const lastPlatform = platforms[platforms.length - 1];
+            if (lastPlatform.y < height) {
+                const gap = 100 + Math.random() * 40;
+                platforms.push(new Platform(lastPlatform.y + gap));
+            }
+        }
+
+        function checkCollisions() {
+            let onPlatform = false;
+
+            for (let p of platforms) {
+                if (!p.active) continue;
+
+                if (player.vy >= 0 &&
+                    player.x + player.width > p.x &&
+                    player.x < p.x + p.width &&
+                    player.y + player.height >= p.y &&
+                    player.y + player.height <= p.y + p.height + player.vy + 2
+                   ) {
+                    
+                    onPlatform = true;
+                    player.y = p.y - player.height;
+                    player.vy = -gameSpeed;
+                    
+                    if (p.type === PLATFORM_TYPES.SPIKE) {
+                        player.hurt(1);
+                    } else if (p.type === PLATFORM_TYPES.SPRING) {
+                        player.vy = -15;
+                        onPlatform = false;
+                    } else if (p.type === PLATFORM_TYPES.FAKE) {
+                        if (!p.steppedOn) {
+                            p.steppedOn = true;
+                            setTimeout(() => { p.active = false; }, 250);
+                        }
+                    } else if (p.type === PLATFORM_TYPES.SLIDE_LEFT) {
+                        player.x -= 2;
+                    } else if (p.type === PLATFORM_TYPES.SLIDE_RIGHT) {
+                        player.x += 2;
+                    } else {
+                        if (!p.steppedOn) {
+                            player.heal(10);
+                            p.steppedOn = true;
+                            score++;
+                            scoreEl.innerText = score;
+                            
+                            if (score % 10 === 0) gameSpeed += 0.05;
+                        }
+                    }
+                }
+            }
+            player.isOnGround = onPlatform;
+        }
+
+        function drawCeilingSpikes() {
+            ctx.fillStyle = '#555';
+            ctx.fillRect(0, 0, width, 20);
+            ctx.fillStyle = '#aaa';
+            ctx.beginPath();
+            const spikeWidth = 20;
+            for (let i=0; i<width; i+=spikeWidth) {
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i + spikeWidth/2, 20);
+                ctx.lineTo(i + spikeWidth, 0);
+            }
+            ctx.fill();
+        }
+
+        function updateHpBar() {
+            const pct = (player.hp / player.maxHp) * 100;
+            hpBar.style.width = `${pct}%`;
+        }
+
+        function gameOver() {
+            gameState = 'GAMEOVER';
+            finalScoreEl.innerText = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        function gameLoop(timestamp) {
+            if (gameState !== 'PLAYING') return;
+
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+
+            ctx.clearRect(0, 0, width, height);
+
+            spawnPlatform();
+            platforms = platforms.filter(p => p.update());
+
+            player.update(dt);
+            checkCollisions();
+
+            platforms.forEach(p => p.draw());
+            player.draw();
+            drawCeilingSpikes();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        startBtn.addEventListener('click', initGame);
+        restartBtn.addEventListener('click', initGame);
+
+    </script>
+</body>
+</html>

@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 這行程式碼讓 sasa.png 變成瀏覽器分頁標題左邊的圖示 -->
+    <link rel="icon" type="image/png" href="sasa.png">
+    
     <title>Sasa 下樓梯</title>
     <style>
         body {
@@ -178,7 +182,7 @@
                 電腦：左右方向鍵移動<br>
                 手機：按左半邊向左，按右半邊向右<br>
                 <br>
-                (這是一個有關sasa偷走的故事)
+                (這是有關sasa偷走的故事)
             </p>
             <button id="start-btn">開始遊戲</button>
         </div>
@@ -205,7 +209,7 @@
         const btnLeft = document.getElementById('btn-left');
         const btnRight = document.getElementById('btn-right');
 
-        // 載入角色圖片 (已改為 png)
+        // 載入角色圖片
         const playerImg = new Image();
         playerImg.src = 'sasa.png'; 
         let isImgLoaded = false;
@@ -239,7 +243,7 @@
             maxHp: 100,
             color: '#fff',
             direction: 1, 
-            currentPlatform: null, // 新增：紀錄當前踩著的平台
+            currentPlatform: null,
             
             reset: function() {
                 this.width = width * 0.08; 
@@ -255,7 +259,6 @@
             },
 
             update: function(dt) {
-                // 左右移動邏輯
                 if (keys.left) {
                     this.vx = -this.speed;
                     this.direction = -1;
@@ -268,38 +271,32 @@
 
                 this.x += this.vx;
 
-                // 邊界檢查
                 if (this.x < 0) this.x = 0;
                 if (this.x + this.width > width) this.x = width - this.width;
 
-                // 垂直移動邏輯 (防抖動核心)
+                // 平台吸附邏輯 (防抖動)
                 if (this.currentPlatform && this.currentPlatform.active) {
-                    // 如果正站在平台上，直接鎖定 Y 座標，不使用重力
                     this.y = this.currentPlatform.y - this.height;
                     this.vy = 0;
 
-                    // 檢查是否走出了平台範圍
                     if (this.x + this.width < this.currentPlatform.x || 
                         this.x > this.currentPlatform.x + this.currentPlatform.width) {
-                        this.currentPlatform = null; // 離開平台，開始落下
+                        this.currentPlatform = null;
                     }
                 } else {
-                    // 如果在空中，應用重力
                     this.vy += 0.4;
                     this.y += this.vy;
                     this.currentPlatform = null;
                 }
 
-                // 頂部尖刺判定
                 const ceilingSpikeHeight = 20;
                 if (this.y < ceilingSpikeHeight) {
                     this.hurt(5);
                     this.y = ceilingSpikeHeight + 5;
                     this.vy = 2;
-                    this.currentPlatform = null; // 被刺到強制脫離平台
+                    this.currentPlatform = null;
                 }
 
-                // 掉到底部判定
                 if (this.y > height) {
                     gameOver();
                 }
@@ -317,10 +314,6 @@
                 } else {
                     ctx.fillStyle = this.color;
                     ctx.fillRect(this.x, this.y, this.width, this.height);
-                    ctx.fillStyle = 'black';
-                    const eyeSize = this.width * 0.2;
-                    const eyeOffset = this.direction === 1 ? this.width * 0.6 : this.width * 0.2;
-                    ctx.fillRect(this.x + eyeOffset, this.y + this.height * 0.2, eyeSize, eyeSize);
                 }
 
                 if (this.hurtTimer > 0) {
@@ -507,12 +500,10 @@
         }
 
         function checkCollisions() {
-            // 如果已經在平台上，就不需要重複檢測碰撞，除非平台消失了
             if (player.currentPlatform && !player.currentPlatform.active) {
                 player.currentPlatform = null;
             }
 
-            // 只有當不在平台上，且正在往下掉的時候才檢測碰撞
             if (!player.currentPlatform && player.vy >= 0) {
                 for (let p of platforms) {
                     if (!p.active) continue;
@@ -520,26 +511,23 @@
                     if (player.x + player.width > p.x &&
                         player.x < p.x + p.width &&
                         player.y + player.height >= p.y &&
-                        player.y + player.height <= p.y + p.height + player.vy + 5 // 增加一點寬容度
+                        player.y + player.height <= p.y + p.height + player.vy + 5 
                        ) {
-                        
-                        // 碰撞發生！
                         
                         if (p.type === PLATFORM_TYPES.SPIKE) {
                             player.hurt(1);
-                            player.vy = -5; // 被刺到彈起
+                            player.vy = -5; 
                         } else if (p.type === PLATFORM_TYPES.SPRING) {
-                            player.vy = -15; // 彈簧跳高
+                            player.vy = -15; 
                         } else if (p.type === PLATFORM_TYPES.FAKE) {
                             if (!p.steppedOn) {
                                 p.steppedOn = true;
-                                player.currentPlatform = p; // 暫時站上去
+                                player.currentPlatform = p; 
                                 setTimeout(() => { p.active = false; }, 250);
                             }
                         } else {
-                            // 正常平台、滑動平台
-                            player.currentPlatform = p; // 鎖定這個平台
-                            player.y = p.y - player.height; // 修正位置
+                            player.currentPlatform = p; 
+                            player.y = p.y - player.height; 
                             
                             if (p.type === PLATFORM_TYPES.SLIDE_LEFT) {
                                 player.x -= 2;
@@ -612,4 +600,3 @@
     </script>
 </body>
 </html>
-
